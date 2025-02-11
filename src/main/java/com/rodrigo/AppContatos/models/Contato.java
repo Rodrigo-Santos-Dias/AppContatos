@@ -2,6 +2,8 @@ package com.rodrigo.AppContatos.models;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "tb_contato")
 public class Contato {
@@ -14,6 +16,52 @@ public class Contato {
     @Column(nullable = false)
     private TipoContato tipoContato;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String contato;
+
+    @ManyToOne
+    @JoinColumn(name = "pessoa_id")
+    private Pessoa pessoa;
+
+    public Contato() {
+    }
+
+    public Contato(Long id, TipoContato tipoContato, String contato, Pessoa pessoa) {
+        this.id = id;
+        this.tipoContato = tipoContato;
+        this.contato = contato;
+        this.pessoa = pessoa;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public TipoContato getTipoContato() {
+        return tipoContato;
+    }
+
+    public void setTipoContato(TipoContato tipoContato) {
+        this.tipoContato = tipoContato;
+    }
+
+    public String getContato() {
+        return contato;
+    }
+
+    public void setContato(String contato) {
+        this.contato = contato;
+    }
+
+    public Pessoa getPessoa() {
+        return pessoa;
+    }
+
+    public void setPessoa(Pessoa pessoa) {
+        this.pessoa = pessoa;
+    }
 }
