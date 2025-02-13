@@ -23,7 +23,6 @@ public class Pessoa {
     private String uf;
 
     @OneToMany(mappedBy = "pessoa",cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "contato_id", referencedColumnName = "id")
     private List<Contato> contato;
 
     public Pessoa(){

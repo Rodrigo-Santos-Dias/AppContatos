@@ -12,6 +12,8 @@ public class Contato {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nome;
+
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private TipoContato tipoContato;
@@ -26,8 +28,9 @@ public class Contato {
     public Contato() {
     }
 
-    public Contato(Long id, TipoContato tipoContato, String contato, Pessoa pessoa) {
+    public Contato(Long id,String nome ,TipoContato tipoContato, String contato, Pessoa pessoa) {
         this.id = id;
+        this.pessoa = pessoa;
         this.tipoContato = tipoContato;
         this.contato = contato;
         this.pessoa = pessoa;
@@ -40,6 +43,15 @@ public class Contato {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
 
     public TipoContato getTipoContato() {
         return tipoContato;
