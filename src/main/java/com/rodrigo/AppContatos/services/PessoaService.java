@@ -14,12 +14,32 @@ public class PessoaService {
     private PessoaRepository pessoaRepository;
 
     public List<Pessoa> findAll() {
-        return pessoaRepository.findAll();
+        List<Pessoa> pessoas = pessoaRepository.findAll();
+        if (pessoas.isEmpty()) {
+            throw new IllegalArgumentException("Não há pessoas cadastradas.");
+        }
+        return pessoas;
     }
 
     public Optional<Pessoa> findById(Long id) {
-        return pessoaRepository.findById(id);
+        Optional<Pessoa> pessoa = pessoaRepository.findById(id);
+
+        if (pessoa.isEmpty()) {
+            throw new IllegalArgumentException("Pessoa não encontrada para o id: " + id);
+        }
+
+        return pessoa;
     }
+
+    public Optional<Pessoa> getByNome(String nome) {
+        Optional<Pessoa> pessoa = pessoaRepository.findByNome(nome);
+
+        if (!pessoa.isPresent()) {
+            throw new IllegalArgumentException("Essa pessoa não está na lista.");
+        }
+        return pessoa;
+    }
+
 
     public Pessoa update (Pessoa pessoa){
         Optional<Pessoa> pessoaJaExistente = pessoaRepository.findById(pessoa.getId());

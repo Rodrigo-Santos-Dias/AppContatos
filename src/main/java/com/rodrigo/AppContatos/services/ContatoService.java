@@ -20,14 +20,23 @@ public class ContatoService {
     private PessoaRepository pessoaRepository;
 
     public List<Contato> findAll() {
-
-        return contatoRepository.findAll();
+        List<Contato> contatos =   contatoRepository.findAll();
+        if (contatos.isEmpty()) {
+            throw new IllegalArgumentException("Não há contatos cadastrados.");
+        }
+        return contatos;
     }
 
 
     public Optional<Contato> findById(Long id) {
 
-        return contatoRepository.findById(id);
+        Optional<Contato> contato= contatoRepository.findById(id);
+
+        if (contato.isEmpty()) {
+            throw new IllegalArgumentException("Contato não encontrado para o id: " + id);
+        }
+
+        return contato;
     }
 
     public Contato update (Contato contato){
@@ -45,30 +54,15 @@ public class ContatoService {
 
     public Contato save(Contato contato) {
         try {
-            //O contato deve estar associado a uma Pessoa
+
             if (contato.getPessoa() == null) {
                 throw new IllegalArgumentException("O contato deve estar associado a uma pessoa.");
             }
 
-            // 2ª Validação: O contato e o tipo de contato não podem ser nulos
             if (contato.getContato() == null || contato.getTipoContato() == null) {
                 throw new IllegalArgumentException("O contato e o tipo de contato não podem ser nulos.");
             }
 
-            // 3ª Validação: O contato deve seguir um padrão específico (telefone fixo ou celular)
-           /* if (contato.getTipoContato().equalsIgnoreCase("telefone")) {
-                if (!Pattern.matches("^\\d{2}-\\d{4}-\\d{4}$", contato.getContato())) {
-                    throw new IllegalArgumentException("Formato inválido para telefone fixo. Use XX-XXXX-XXXX.");
-                }
-            } else if (contato.getTipoContato().equalsIgnoreCase("celular")) {
-                if (!Pattern.matches("^\\d{2}-\\d{5}-\\d{4}$", contato.getContato())) {
-                    throw new IllegalArgumentException("Formato inválido para celular. Use XX-XXXXX-XXXX.");
-                }
-            } else {
-                throw new IllegalArgumentException("Tipo de contato inválido. Use 'telefone' ou 'celular'.");
-            }
-           */
-            // 4ª Validação: Verificar se já existe um contato igual para a mesma pessoa
             boolean contatoDuplicado = contatoRepository.existsByPessoaAndContato(contato.getPessoa(), contato.getContato());
             if (contatoDuplicado) {
                 throw new IllegalArgumentException("Esse contato já está cadastrado para essa pessoa.");
