@@ -59,7 +59,7 @@ public class ContatoController {
     @Operation(summary = "Atualizar contato por ID")
     @PutMapping("/{id}")
     public ResponseEntity<Contato> update(@PathVariable Long id, @Valid @RequestBody Contato contato) {
-        if (!contatoRepository.findById(contato.getId()).isPresent()) {
+        if (!contatoRepository.findById(id).isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Contato não encontrado");
         }
         contato.setId(id);
