@@ -1,5 +1,6 @@
 package com.rodrigo.AppContatos.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 
@@ -28,6 +29,7 @@ public class Pessoa {
 
     private String uf;
 
+    @JsonIgnoreProperties("pessoa")
     @OneToMany(mappedBy = "pessoa",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contato> contato;
 
@@ -102,6 +104,7 @@ public class Pessoa {
     public void setUf(String uf) {
         this.uf = uf;
     }
+
 
     public List<Contato> getContato() {
         return contato;

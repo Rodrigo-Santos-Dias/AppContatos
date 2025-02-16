@@ -5,14 +5,15 @@ import com.rodrigo.AppContatos.repositories.ContatoRepository;
 import com.rodrigo.AppContatos.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
+
 
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
+
 
 @Service
 public class ContatoService {
+
     @Autowired
     private ContatoRepository contatoRepository;
 
@@ -46,6 +47,7 @@ public class ContatoService {
             updateContato.setNome(contato.getNome());
             updateContato.setContato(contato.getContato());
             updateContato.setTipoContato(contato.getTipoContato());
+            updateContato.setPessoa(contato.getPessoa());
             return contatoRepository.save(updateContato);
         }else {
             return contatoRepository.save(contato);

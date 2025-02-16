@@ -86,7 +86,7 @@ public class PessoaController {
 
     @Operation(summary = "Deletar pessoa por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+    public ResponseEntity<?> deleteById(@PathVariable Long id) {
         if (!pessoaRepository.findById(id).isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada");
         }

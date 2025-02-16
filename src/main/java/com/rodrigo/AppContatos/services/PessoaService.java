@@ -56,7 +56,7 @@ public class PessoaService {
         Optional<Pessoa> pessoaExistente = pessoaRepository.findById(pessoa.getId());
 
         if (pessoaExistente.isEmpty()) {
-            throw new IllegalArgumentException("Pessoa não encontrada para o ID: " + pessoa.getId());
+            return create(pessoa);
         }
 
         Pessoa updatePessoa = pessoaExistente.get();

@@ -1,5 +1,6 @@
 package com.rodrigo.AppContatos.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class Contato {
 
     @ManyToOne
     @JoinColumn(name = "pessoa_id")
+    @JsonIgnoreProperties("contato")
     private Pessoa pessoa;
 
     public Contato() {
