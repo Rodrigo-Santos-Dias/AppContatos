@@ -1,5 +1,6 @@
 package com.rodrigo.AppContatos.services;
 
+import com.rodrigo.AppContatos.dto.PessoaMalaDiretaDTO;
 import com.rodrigo.AppContatos.models.Pessoa;
 import com.rodrigo.AppContatos.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,47 +32,77 @@ public class PessoaService {
         return pessoa;
     }
 
-    public Optional<Pessoa> getByNome(String nome) {
-        Optional<Pessoa> pessoa = pessoaRepository.findByNome(nome);
+    public PessoaMalaDiretaDTO getMalaDireta(Long id) {
 
-        if (!pessoa.isPresent()) {
-            throw new IllegalArgumentException("Essa pessoa não está na lista.");
-        }
-        return pessoa;
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada com o ID: " + id));
+
+        // Formata a mala direta, garantindo que os valores não sejam nulos
+        String malaDireta = String.format("%s – CEP: %s – %s/%s",
+                pessoa.getEndereco() != null ? pessoa.getEndereco() : "Endereço não informado",
+                pessoa.getCep() != null ? pessoa.getCep() : "CEP não informado",
+                pessoa.getCidade() != null ? pessoa.getCidade() : "Cidade não informada",
+                pessoa.getUf() != null ? pessoa.getUf() : "UF não informada");
+
+        return new PessoaMalaDiretaDTO(pessoa.getId(), pessoa.getNome(), malaDireta);
     }
 
 
-    public Pessoa update (Pessoa pessoa){
-        Optional<Pessoa> pessoaJaExistente = pessoaRepository.findById(pessoa.getId());
-
-        if (pessoaJaExistente.isPresent()){
-            Pessoa updatePessoa = pessoaJaExistente.get();
-            updatePessoa.setNome(pessoa.getNome());
-            updatePessoa.setCep(pessoa.getCep());
-            updatePessoa.setCidade(pessoa.getCidade());
-            updatePessoa.setEndereco(pessoa.getEndereco());
-            updatePessoa.setUf(pessoa.getUf());
-            return pessoaRepository.save(updatePessoa);
-        }else {
-            return pessoaRepository.save(pessoa);
+    public Pessoa update(Pessoa pessoa) {
+        if (pessoa == null || pessoa.getId() == null) {
+            throw new IllegalArgumentException("O ID da pessoa é obrigatório para atualização.");
         }
+
+        Optional<Pessoa> pessoaExistente = pessoaRepository.findById(pessoa.getId());
+
+        if (pessoaExistente.isEmpty()) {
+            throw new IllegalArgumentException("Pessoa não encontrada para o ID: " + pessoa.getId());
+        }
+
+        Pessoa updatePessoa = pessoaExistente.get();
+        updatePessoa.setNome(pessoa.getNome());
+        updatePessoa.setCep(pessoa.getCep());
+        updatePessoa.setCidade(pessoa.getCidade());
+        updatePessoa.setEndereco(pessoa.getEndereco());
+        updatePessoa.setUf(pessoa.getUf());
+
+        return pessoaRepository.save(updatePessoa);
     }
 
-    public Pessoa save(Pessoa pessoa) {
-        Optional<Pessoa> pessoaJaExistente  = pessoaRepository.findById(pessoa.getId());
-        if (pessoaJaExistente.isPresent()){
-            System.out.println("Pessoa ja Cadastrada no banco de dados");
-            return pessoaJaExistente.get();
-        }else{
-            return pessoaRepository.save(pessoa);
+
+
+    public Pessoa create(Pessoa pessoa) {
+        if (pessoa == null) {
+            throw new IllegalArgumentException("Os dados da pessoa não podem ser nulos.");
         }
+
+        if (pessoa.getNome() == null || pessoa.getNome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome da pessoa é obrigatório.");
+        }
+
+
+
+        if (emailExiste(pessoa.getEmail())) {
+
+            throw new IllegalArgumentException("O e-mail já está cadastrado.");
+        }
+
+        return pessoaRepository.save(pessoa);
     }
+
+
+
 
     public void deleteById(Long id) {
         Optional<Pessoa> pessoa = pessoaRepository.findById(id);
         if (pessoa.isEmpty()){
-            throw new RuntimeException("Pessoa não encontrada");
+            throw new IllegalArgumentException("Pessoa não encontrada");
         }
         pessoaRepository.deleteById(id);
+    }
+
+    public boolean emailExiste(String email) {
+        Optional<Pessoa> pessoa = pessoaRepository.findByEmail(email);
+        return pessoa.isPresent();
     }
 }
