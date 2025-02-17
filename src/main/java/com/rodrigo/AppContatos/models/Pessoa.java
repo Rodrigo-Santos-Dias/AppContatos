@@ -3,6 +3,7 @@ package com.rodrigo.AppContatos.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -14,12 +15,9 @@ public class Pessoa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome não pode estar em branco")
     @Column(nullable = false)
     private String nome;
-
-    @Email
-    @Column(nullable = false,unique = true)
-    private String email;
 
     private String endereco;
 
@@ -31,22 +29,21 @@ public class Pessoa {
 
     @JsonIgnoreProperties("pessoa")
     @OneToMany(mappedBy = "pessoa",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Contato> contato;
+    private List<Contato> contatos;
 
     public Pessoa(){
 
     }
 
-    public Pessoa(Long id, String nome, String email, String endereco,
+    public Pessoa(Long id, String nome, String endereco,
                   String cep, String cidade, String uf, List<Contato> contato) {
         this.id = id;
         this.nome = nome;
-        this.email = email;
         this.endereco = endereco;
         this.cep = cep;
         this.cidade = cidade;
         this.uf = uf;
-        this.contato = contato;
+        this.contatos = contato;
     }
 
     public Long getId() {
@@ -65,13 +62,6 @@ public class Pessoa {
         this.nome = nome;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getEndereco() {
         return endereco;
@@ -107,10 +97,10 @@ public class Pessoa {
 
 
     public List<Contato> getContato() {
-        return contato;
+        return contatos;
     }
 
     public void setContato(List<Contato> contato) {
-        this.contato = contato;
+        this.contatos = contato;
     }
 }

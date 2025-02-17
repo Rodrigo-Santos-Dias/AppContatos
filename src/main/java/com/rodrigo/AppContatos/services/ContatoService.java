@@ -1,93 +1,62 @@
 package com.rodrigo.AppContatos.services;
 
 import com.rodrigo.AppContatos.models.Contato;
+import com.rodrigo.AppContatos.models.Pessoa;
 import com.rodrigo.AppContatos.repositories.ContatoRepository;
 import com.rodrigo.AppContatos.repositories.PessoaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
-
 
 @Service
 public class ContatoService {
 
-    @Autowired
-    private ContatoRepository contatoRepository;
+    private final ContatoRepository contatoRepository;
+    private final PessoaRepository pessoaRepository;
 
-    @Autowired
-    private PessoaRepository pessoaRepository;
+
+    public ContatoService(ContatoRepository contatoRepository, PessoaRepository pessoaRepository) {
+        this.contatoRepository = contatoRepository;
+        this.pessoaRepository = pessoaRepository;
+    }
 
     public List<Contato> findAll() {
-        List<Contato> contatos =   contatoRepository.findAll();
+        List<Contato> contatos = contatoRepository.findAll();
         if (contatos.isEmpty()) {
-            throw new IllegalArgumentException("Não há contatos cadastrados.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Não há contatos cadastrados.");
         }
         return contatos;
     }
 
-
-    public Optional<Contato> findById(Long id) {
-
-        Optional<Contato> contato= contatoRepository.findById(id);
-
-        if (contato.isEmpty()) {
-            throw new IllegalArgumentException("Contato não encontrado para o id: " + id);
-        }
-
-        return contato;
+    public Contato findById(Long id) {
+        return contatoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contato não encontrado para o ID: " + id));
     }
 
-    public Contato update (Contato contato){
-        Optional <Contato> findContato = contatoRepository.findById(contato.getId());
-        if (findContato.isPresent()){
-            Contato updateContato = findContato.get();
-            updateContato.setNome(contato.getNome());
-            updateContato.setContato(contato.getContato());
-            updateContato.setTipoContato(contato.getTipoContato());
-            updateContato.setPessoa(contato.getPessoa());
-            return contatoRepository.save(updateContato);
-        }else {
-            return contatoRepository.save(contato);
+    @Transactional
+    public Contato saveOrUpdate(Contato contato) {
+        if (contato.getPessoa() == null || contato.getContato() == null || contato.getTipoContato() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O contato, o tipo de contato e a pessoa são obrigatórios.");
         }
+
+        Pessoa pessoa = pessoaRepository.findById(contato.getPessoa().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada para o ID: " + contato.getPessoa().getId()));
+
+        boolean contatoDuplicado = contatoRepository.existsByPessoaAndContato(pessoa, contato.getContato());
+        if (contatoDuplicado) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esse contato já está cadastrado para essa pessoa.");
+        }
+
+        contato.setPessoa(pessoa);
+        return contatoRepository.save(contato);
     }
 
-    public Contato save(Contato contato) {
-        try {
-
-            if (contato.getPessoa() == null) {
-                throw new IllegalArgumentException("O contato deve estar associado a uma pessoa.");
-            }
-
-            if (contato.getContato() == null || contato.getTipoContato() == null) {
-                throw new IllegalArgumentException("O contato e o tipo de contato não podem ser nulos.");
-            }
-
-            boolean contatoDuplicado = contatoRepository.existsByPessoaAndContato(contato.getPessoa(), contato.getContato());
-            if (contatoDuplicado) {
-                throw new IllegalArgumentException("Esse contato já está cadastrado para essa pessoa.");
-            }
-            return contatoRepository.save(contato);
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Erro de validação: " + e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            System.out.println("Erro inesperado ao salvar o contato.");
-            throw new RuntimeException("Erro inesperado ao salvar o contato.");
-        }
-    }
-
+    @Transactional
     public void deleteById(Long id) {
-        Optional<Contato> contato = contatoRepository.findById(id);
-        if (contato.isPresent()){
-            contatoRepository.deleteById(id);
-        }else{
-            throw new RuntimeException("Contato não encontrado com o id: " + id);
-        }
+        Contato contato = findById(id);
+        contatoRepository.delete(contato);
     }
-
-
 }
