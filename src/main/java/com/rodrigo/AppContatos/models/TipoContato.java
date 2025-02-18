@@ -1,6 +1,6 @@
 package com.rodrigo.AppContatos.models;
 
-enum TipoContato {
+ public enum TipoContato {
     TELEFONE, // 0
     CELULAR   // 1
 }

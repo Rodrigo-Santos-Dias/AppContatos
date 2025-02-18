@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
-import static org.mockito.Mockito.*;
 import org.springframework.http.MediaType;
 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -58,7 +57,7 @@ class PessoaControllerTest {
         mockMvc.perform(get("/api/pessoas"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nome").value("Rodrigo Silva"));
+                .andExpect(jsonPath("$[0].nome").value("Rodrigo Dias"));
     }
 
     @Test
@@ -67,7 +66,7 @@ class PessoaControllerTest {
 
         mockMvc.perform(get("/api/pessoas/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nome").value("Rodrigo Silva"));
+                .andExpect(jsonPath("$.nome").value("Rodrigo Dias"));
     }
 
     @Test
@@ -78,6 +77,6 @@ class PessoaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(pessoa)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.nome").value("Rodrigo Silva"));
+                .andExpect(jsonPath("$.nome").value("Rodrigo Dias"));
     }
 }
