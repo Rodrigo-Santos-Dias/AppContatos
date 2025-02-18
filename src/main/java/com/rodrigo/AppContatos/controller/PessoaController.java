@@ -17,7 +17,7 @@ public class PessoaController {
 
     private final PessoaService pessoaService;
 
-    // Injeção via construtor
+
     public PessoaController(PessoaService pessoaService) {
         this.pessoaService = pessoaService;
     }

@@ -15,7 +15,6 @@ public class PessoaService {
 
     private final PessoaRepository pessoaRepository;
 
-    // Construtor explícito para injeção de dependência
     public PessoaService(PessoaRepository pessoaRepository) {
         this.pessoaRepository = pessoaRepository;
     }

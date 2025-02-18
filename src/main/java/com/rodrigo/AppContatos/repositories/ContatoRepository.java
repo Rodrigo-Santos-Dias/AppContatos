@@ -13,5 +13,5 @@ public interface ContatoRepository extends JpaRepository<Contato,Long> {
 
     boolean existsByPessoaAndContato(Pessoa pessoa, String contato);
 
-    List<Contato>findAllByPessoa(Pessoa pessoa);
+
 }
